@@ -4,6 +4,7 @@ import com.example.bookwatch.domain.model.Book
 
 data class DetailState(
     val book: Book? = null,
+    val bookDescription: String? = null,
     val isLoading: Boolean = false,
     val error: String? = null
 )

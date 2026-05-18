@@ -25,8 +25,12 @@ fun DetailScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    // Загружаем описание при первом показе
     LaunchedEffect(book) {
         viewModel.setBook(book)
+        book.openLibraryKey?.let { key ->
+            viewModel.handleIntent(DetailIntent.LoadDescription(key))
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -120,15 +124,42 @@ fun DetailScreen(
 
                 Divider(modifier = Modifier.padding(vertical = 16.dp))
 
-                currentBook.description?.let { description ->
+                // ОПИСАНИЕ КНИГИ
+                if (state.isLoading) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                } else if (state.bookDescription != null) {
                     Text(
                         text = "Описание",
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = description,
+                        text = state.bookDescription!!,
                         style = MaterialTheme.typography.bodyMedium
+                    )
+                } else if (state.error != null) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        )
+                    ) {
+                        Text(
+                            text = "Не удалось загрузить описание",
+                            modifier = Modifier.padding(16.dp),
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                    }
+                } else {
+                    Text(
+                        text = "Описание отсутствует",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                 }
 
