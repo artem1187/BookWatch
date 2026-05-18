@@ -9,6 +9,7 @@ import com.example.bookwatch.domain.repository.BookRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import android.util.Log
 
 class BookRepositoryImpl @Inject constructor(
     private val database: AppDatabase
@@ -44,20 +45,32 @@ class BookRepositoryImpl @Inject constructor(
         }
     }
 
-
     override suspend fun getBookDescription(openLibraryKey: String): String? {
         return try {
             val details = RetrofitInstance.api.getBookDetails(openLibraryKey)
-
-            // Описание может быть в разных форматах
-            when (val desc = details.description) {
-                is String -> desc
-                is Map<*, *> -> desc["value"] as? String
-                else -> details.firstSentence?.firstOrNull() ?: "Описание отсутствует"
-            }
+            extractDescription(details.description, details.firstSentence)
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("BookRepo", "Error getting description", e)
             null
+        }
+    }
+
+    // Вспомогательная функция для извлечения описания
+    private fun extractDescription(description: Any?, firstSentence: List<String>?): String {
+        return when {
+            description is String -> description
+            description is Map<*, *> -> {
+                val value = description["value"]
+                when (value) {
+                    is String -> value
+                    else -> value?.toString() ?: "Описание отсутствует"
+                }
+            }
+            description != null -> description.toString()
+            else -> {
+                // Если нет описания, пробуем взять первое предложение
+                firstSentence?.firstOrNull() ?: "Описание отсутствует"
+            }
         }
     }
 }
