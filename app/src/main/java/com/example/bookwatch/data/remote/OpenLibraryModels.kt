@@ -23,9 +23,13 @@ data class OpenLibraryDoc(
     @SerializedName("subject")
     val subjects: List<String>?,
     @SerializedName("description")
-    val description: String?,
+    val description: String?,  // ← Уже есть
     @SerializedName("number_of_pages")
-    val numberOfPages: Int?
+    val numberOfPages: Int?,
+    @SerializedName("first_sentence")
+    val firstSentence: List<String>?,  // ← Добавить
+    @SerializedName("publishers")
+    val publishers: List<String>?  // ← Добавить
 )
 
 // Упрощенная модель для поиска
@@ -38,4 +42,22 @@ data class SearchBook(
     val categories: String? = null,
     val description: String? = null,
     val pageCount: Int? = null
+)
+
+data class OpenLibraryDetailsResponse(
+    @SerializedName("description")
+    val description: Any?,  // Может быть String или Map
+    @SerializedName("first_sentence")
+    val firstSentence: FirstSentence?,
+    @SerializedName("subjects")
+    val subjects: List<String>?,
+    @SerializedName("covers")
+    val covers: List<Int>?
+)
+
+data class FirstSentence(
+    @SerializedName("type")
+    val type: String?,
+    @SerializedName("value")
+    val value: String?
 )

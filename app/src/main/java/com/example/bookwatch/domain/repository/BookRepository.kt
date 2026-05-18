@@ -10,5 +10,5 @@ interface BookRepository {
     suspend fun deleteSelectedBooks()
     suspend fun updateBook(book: Book)
     suspend fun searchBooks(query: String): List<SearchBook>
-    suspend fun getBookDetails(openLibraryKey: String): SearchBook?
+    suspend fun getBookDescription(openLibraryKey: String): String?
 }

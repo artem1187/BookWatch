@@ -44,10 +44,17 @@ class BookRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getBookDetails(openLibraryKey: String): SearchBook? {
+
+    override suspend fun getBookDescription(openLibraryKey: String): String? {
         return try {
-            val response = RetrofitInstance.api.getBookDetails(openLibraryKey)
-            BookMapper.toSearchBook(response)
+            val details = RetrofitInstance.api.getBookDetails(openLibraryKey)
+
+            // Описание может быть в разных форматах
+            when (val desc = details.description) {
+                is String -> desc
+                is Map<*, *> -> desc["value"] as? String
+                else -> details.firstSentence?.firstOrNull() ?: "Описание отсутствует"
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             null

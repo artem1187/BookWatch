@@ -12,7 +12,8 @@ interface OpenLibraryApiService {
         @Query("limit") limit: Int = 20
     ): OpenLibrarySearchResponse
 
-    @GET("works/{key}.json")
+
+    @GET("{key}.json")
     suspend fun getBookDetails(
         @Path("key") key: String
     ): OpenLibraryDoc
